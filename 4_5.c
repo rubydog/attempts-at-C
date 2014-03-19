@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h> /* for atof() */
 #include <math.h>
-#include <ctype.h>
 #define MAXOP 100 /* max size of operand or operator */ 
 #define NUMBER '0' /* signal that a number was found */
 #define ALPHA '1'
@@ -19,6 +18,7 @@ main()
 	double op2;
         char s[MAXOP];
 	while ((type = getop(s)) != EOF) { switch (type) {
+		printf("%s", s);
         case NUMBER:
 			push(atof(s));
 			break;
@@ -46,20 +46,26 @@ main()
 			else
 				printf("error: zero divisor\n");
 			break;
-                case 'p':
-                        printtop();
-                        break;
-                case 'd':
-                        duplicate();
-                        break;
-                case 'c':
-                        clear();
-                        break;
-                case 's':
-                        swap();
-                        break;
+        case 'p':
+                printtop();
+                break;
+        case 'd':
+                duplicate();
+                break;
+        case 'c':
+                clear();
+                break;
+        case 's':
+                swap();
+                break;
+		case 'sin':
+				push(sin(pop()));
+				break;
+		case 'pow':
+				push(pow(pop()**pop());
+				break;
 		case '\n':
-			/* printf("\t%.8g\n", pop()); */
+			printf("\t%.8g\n", pop()); 
 			break;
 		default:
 			printf("error: unknown command %s\n", s);
@@ -101,10 +107,13 @@ int getop(char s[])
 	while ((s[0] = c = getch()) == ' ' || c == '\t') 
 		;
 	s[1] = '\0';
-
-	if (!isdigit(c) && c != '.')
+	
+	if (!isalpha(c) && !isdigit(c) && c != '.')
 		return c; /* not a number */ 
-        i = 0;
+    i = 0;
+	if (isalpha(c))
+		while (isalpha(s[++i] = c = getch()))
+			;
 	if (isdigit(c)) /* collect integer part */
 		while (isdigit(s[++i] = c = getch()))
 			;

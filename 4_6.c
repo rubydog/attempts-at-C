@@ -1,25 +1,79 @@
 #include <stdio.h>
 #include <stdlib.h> /* for atof() */
 #include <math.h>
-#include <ctype.h>
-#define MAXOP 100 /* max size of operand or operator */ 
+#define MAXOP 100 /* max size of operand or operator */
+#define MAXCHAR 1000
 #define NUMBER '0' /* signal that a number was found */
 #define ALPHA '1'
 int getop(char []);
 void push(double);
 double pop(void);
-void printtop();
-void duplicate();
-void swap();
-void clear();
+int is_equal(char s[], int j);
+char variable_list[MAXCHAR];
+double variable_value[MAXCHAR];
+int variable_size[MAXCHAR];
+int total_variable_size = 0;
+int variable_count = 0;
 /* reverse Polish calculator */ 
-main()
+int main()
 {
-	int type;
+	int type, i, j;
 	double op2;
         char s[MAXOP];
+	int found = 0;
 	while ((type = getop(s)) != EOF) { switch (type) {
-        case NUMBER:
+		/* case ALPHA: */
+			/* for (i = 0; i < 1000; i+=10) { */
+			/* 	for(int j = 0; s[j] != '\0'; j++) { */
+			/* 		if (variable_list[i+j] = s[j] { */
+			/* 			; */
+			/* 		} else { */
+			/* 			break; */
+			/* 		} */
+			/* 	} */
+
+
+			/* } */
+			/* for (i = 0; s[i] != '\0'; i++) */
+			/* 	variable_list[(variable_index*10)+i] = s[i]; */
+			/* variable_list[(variable_index*10)+i] = '\0'; */
+		case ALPHA:
+			for (j = i = 0; i < MAXCHAR && variable_size[j] != 0; i += variable_size[j++]) {
+				found = is_equal(s, i);
+				if (found)
+					break;
+			}
+
+			if (found)
+			{
+				push(variable_value[j]);
+			} else {
+				for (i = 0; s[i] != '\0'; i++)
+					variable_list[total_variable_size++] = s[i];
+				variable_list[total_variable_size++] = '\0';
+				variable_size[variable_count] = i;
+			}
+			printf("list: %c\n", variable_list[i]);
+			/* for (i = 0; i < 51; i++) { */
+			/* 	if (variable_list[i] == s[0]) { */
+			/* 		push(variable_value[i]); */
+			/* 		break; */
+			/* 	} */
+			/* } */
+			/* if (i >= 51) */
+			/* { */
+			/* 	variable_list[variable_index] = s[0]; */
+			/* } */
+
+			printf("size: %d\n", variable_size);
+			printf("value: %f\n", variable_value);
+			break;
+		case '=':
+			op2 = pop();
+			variable_value[variable_count++] = op2;
+			push(op2);
+			break;
+		case NUMBER:
 			push(atof(s));
 			break;
 		case '+':
@@ -46,29 +100,16 @@ main()
 			else
 				printf("error: zero divisor\n");
 			break;
-                case 'p':
-                        printtop();
-                        break;
-                case 'd':
-                        duplicate();
-                        break;
-                case 'c':
-                        clear();
-                        break;
-                case 's':
-                        swap();
-                        break;
 		case '\n':
-			/* printf("\t%.8g\n", pop()); */
+			printf("\t%.8g\n", pop());
 			break;
 		default:
 			printf("error: unknown command %s\n", s);
 			break;
 		}
 	}
-return 0; 
+	return 0;
 }
-
 
 #define MAXVAL 100 /* maximum depth of val stack */
 int sp = 0; /* next free stack position */ 
@@ -101,10 +142,17 @@ int getop(char s[])
 	while ((s[0] = c = getch()) == ' ' || c == '\t') 
 		;
 	s[1] = '\0';
-
-	if (!isdigit(c) && c != '.')
+	if (!isalpha(c) && !isdigit(c) && c != '.')
 		return c; /* not a number */ 
-        i = 0;
+	i = 0;
+	if (isalpha(c)) {
+		while (isalpha(s[++i] = c = getch()))
+			;
+		s[i] = '\0';
+		if (c != EOF)
+			ungetch(c);
+		return ALPHA;
+	}
 	if (isdigit(c)) /* collect integer part */
 		while (isdigit(s[++i] = c = getch()))
 			;
@@ -132,30 +180,14 @@ void ungetch(int c) /* push character back on input */
 		buf[bufp++] = c;
 }
 
-void duplicate() {
-  int i = 0;
-  double op2;
-  op2 = pop();
-  pop();
-  push(op2);
-  push(op2);
+int is_equal(char s[], int j)
+{
+	for (int i = 0; s[i] != '\0'; i++)
+	{
+		if (s[i] != variable_list[j + i])
+			return 0;
+	}
+
+	return 1;
 }
 
-void swap() {
-  double op1, op2;
-  op2 = pop();
-  op1 = pop();
-  push(op2);
-  push(op1);
-}
-
-void clear() {
-  sp = 0;
-}
-
-void printtop() {
-  double op2;
-  op2 = pop();
-  push(op2);
-  printf("\t%.8g\n", pop());
-}
